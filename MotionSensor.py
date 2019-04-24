@@ -1,4 +1,5 @@
 import math
+import I2CService
 
 
 class MotionSensor:
@@ -13,7 +14,7 @@ class MotionSensor:
     INT_STATUS_REG = 0x3A
 
     Gyro_mode = 0
-    I2C_service = None  # type: I2C_service
+    I2C_service = None  # type: I2CService
 
     # Power management registers
     power_mgmt_1 = 0x6b
