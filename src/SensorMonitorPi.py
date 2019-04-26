@@ -5,11 +5,11 @@ import time
 import threading
 import json
 
-from I2CService import I2CService
-from MotionSensor import MotionSensor
-from LightSensor import LightSensor
-from GPIOService import GPIOService
-from Server import Server
+from src.I2CService import I2CService
+from src.MotionSensor import MotionSensor
+from src.LightSensor import LightSensor
+from src.GPIOService import GPIOService
+from src.Server import Server
 
 bus = smbus2.SMBus(1)  # or bus = smbus.SMBus(1) for Revision 2 boards
 address = 0x68  # This is the address value read via the i2cdetect command
@@ -19,7 +19,7 @@ test = motion_sensor.start_up_gyro()
 print("gyro test result", test[0], test[1], test[2])
 
 gpio_service = GPIOService()
-light_sensor = LightSensor(gpio_service, 4)
+light_sensor = LightSensor()
 buffer_filo = []
 
 

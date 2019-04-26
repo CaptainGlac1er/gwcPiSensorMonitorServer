@@ -1,5 +1,5 @@
 import math
-import I2CService
+from src import I2CService
 
 
 class MotionSensor:
