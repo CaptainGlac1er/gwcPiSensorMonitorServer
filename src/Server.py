@@ -20,7 +20,7 @@ class Server(threading.Thread):
                 self.clients.add(connection)
 
     def send_data(self, data_string: str):
-        print("*****************sending data**********************")
+        #print("*****************sending data**********************")
         with self.clients_locking:
             for client in self.clients:
                 client.send(data_string.encode())

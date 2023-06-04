@@ -1,0 +1,7 @@
+adafruit-blinka
+adafruit-circuitpython-bme680
+adafruit-circuitpython-ads1x15
+smbus2
+RPLCD
+Adafruit_GPIO
+Adafruit_WS2801

@@ -10,7 +10,7 @@ class LEDService:
     PIXEL_COUNT = 1
 
     # Alternatively specify a hardware SPI connection on /dev/spidev0.0:
-    SPI_PORT = 1
+    SPI_PORT = 0
     SPI_DEVICE = 0
 
     def __init__(self):
@@ -21,7 +21,7 @@ class LEDService:
     def set_color(self, r, g, b):
         self.led.set_pixel(0, RGB_to_color(r, g, b))
         self.led.show()
-        time.sleep(0.01)
+        time.sleep(1)
 
     def get_led(self):
         return self.led

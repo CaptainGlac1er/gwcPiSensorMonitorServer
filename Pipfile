@@ -6,7 +6,16 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+board = "*"
 adafruit-circuitpython-ads1x15 = "*"
+adafruit-blinka = "*"
+adafruit-circuitpython-bme680 = "*"
+adafruit-circuitpython-ads1x15 = "*"
+smbus2 = "*"
+RPLCD = "*"
+Adafruit_GPIO = "*"
+Adafruit_WS2801 = "*"
+
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"
