@@ -18,9 +18,11 @@ from GPIOService import GPIOService
 from Server import Server
 
 
+gather_event = threading.Event()
 
 def check_light(light_sensor_connection: LightSensor, led_service, output):
-    while True:
+    print("starting light")
+    while not gather_event.is_set():
 
         light_level = light_sensor_connection.get_data()
         # print("light sensor")
@@ -36,35 +38,19 @@ def check_light(light_sensor_connection: LightSensor, led_service, output):
 
 
 def check_bme680(bme680_sensor_connection: TemperatureSensor, output):
-    while True:
-
+    print("starting bme")
+    while not gather_event.is_set():
         data = bme680_sensor_connection.get_data()
         if data:
-            # print("BME680 sensor")
-            # print("---------")
-            # print("Temperature: ", data["temperature"])
-            # print("Gas: ", data["gas"])
-            # print("Humidity: ", data["humidity"])
-            # print("Pressure: ", data["pressure"])
-            # print("Altitude: ", data["altitude"])
-            # print("------------------")
             output(data)
-        time.sleep(60)
+        time.sleep(10)
 
 
 def check_gyro(motion_sensor_connection: MotionSensor, output):
-    while True:
+    print("starting gyro")
+    while not gather_event.is_set():
 
         gyro = motion_sensor_connection.get_gyro()
-
-        # print("gyro data")
-        # print("---------")
-        #
-        # print("gyro_xout: ", gyro[0])
-        # print("gyro_yout: ", gyro[1])
-        # print("gyro_zout: ", gyro[2])
-        #
-        # print("")
 
         accel = motion_sensor_connection.get_acceleration()
 
@@ -74,16 +60,6 @@ def check_gyro(motion_sensor_connection: MotionSensor, output):
 
         x_rotation = motion_sensor_connection.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
         y_rotation = motion_sensor_connection.get_y_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
-
-        # print("accelerometer data")
-        # print("------------------")
-        #
-        # print("accel_xout: ", accel[0], " scaled: ", accel_xout_scaled)
-        # print("accel_yout: ", accel[1], " scaled: ", accel_yout_scaled)
-        # print("accel_zout: ", accel[2], " scaled: ", accel_zout_scaled)
-        #
-        # print("x rotation: ", x_rotation)
-        # print("y rotation: ", y_rotation)
 
         temp = motion_sensor_connection.get_temp()
         output({
@@ -119,15 +95,12 @@ def main(argv):
     bme_sensor = TemperatureSensor()
     motion_sensor = MotionSensor(I2CService(bus, address), 0)
     test = motion_sensor.start_up_gyro()
-    # print("gyro test result", test[0], test[1], test[2])
 
     gpio_service = GPIOService()
     light_sensor = LightSensor()
     buffer_filo = []
 
-
     server = Server(2048)
-    server.start()
 
     def save_data(file_name, printer, send_data):
         def handle(data):
@@ -185,12 +158,19 @@ def main(argv):
                         )
               )
     )
-    light_thread.start()
-    bme_thread.start()
-    gyro_thread.start()
-    light_thread.join()
-    gyro_thread.join()
-    server.join()
+    try:
+        gather_event.clear()
+        server.start()
+        light_thread.start()
+        bme_thread.start()
+        gyro_thread.start()
+        while True:
+            time.sleep(1)
+    except (KeyboardInterrupt, SystemExit):
+        print("\nStopping Server")
+        gather_event.set()
+        server.stop()
+        sys.exit()
 
 
 if __name__ == '__main__':

@@ -12,8 +12,7 @@ class TemperatureSensor:
     def __init__(self):
         i2c = busio.I2C(board.SCL, board.SDA)
         self.bme680 = Adafruit_BME680_I2C(i2c, debug=False)
-        print("starting BME680")
-        time.sleep(5)
+        print("initializing BME680")
 
     def get_data(self) -> Union[dict[str, Union[float, int]], None]:
         data = None
