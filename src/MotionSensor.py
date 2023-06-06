@@ -1,4 +1,6 @@
 import math
+import time
+
 from I2CService import I2CService
 
 
@@ -14,7 +16,7 @@ class MotionSensor:
     INT_STATUS_REG = 0x3A
 
     Gyro_mode = 0
-    I2C_service = None  # type: I2CService
+    I2C_service: I2CService = None
 
     # Power management registers
     power_mgmt_1 = 0x6b
@@ -22,7 +24,7 @@ class MotionSensor:
 
     Gyro_calibration_data = {}
 
-    def __init__(self, i2c_service: I2C_service, gyro_mode):
+    def __init__(self, i2c_service: I2CService, gyro_mode):
         if gyro_mode > 3 or gyro_mode < 0:
             raise Exception('Must be be contained within 0 and 3')
         self.I2C_service = i2c_service
@@ -37,7 +39,7 @@ class MotionSensor:
         self.I2C_service.write_byte(MotionSensor.INT_ENABLE_REG, before)
 
     def wait_for_data(self):
-        while(True):
+        while True:
             if self.I2C_service.read_byte(MotionSensor.INT_STATUS_REG) & 1 == 1:
                 return True
 
@@ -62,7 +64,6 @@ class MotionSensor:
         return math.degrees(radians)
 
     def start_up_gyro(self):
-        self.wait_for_data()
         before = self.get_gyro()
         init = self.I2C_service.read_byte(MotionSensor.GYRO_CONFIG_REG)
         # self test X
@@ -74,7 +75,6 @@ class MotionSensor:
         # set mode
         init &= (0b11100111 | self.Gyro_mode << 3)
         self.I2C_service.write_byte(MotionSensor.GYRO_CONFIG_REG, init)
-        self.wait_for_data()
         after = self.get_gyro()
         return [x - y for x, y in zip(after, before)]
 

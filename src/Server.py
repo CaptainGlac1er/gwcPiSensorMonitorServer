@@ -62,7 +62,8 @@ class Server(threading.Thread):
                 # Handle "exceptional conditions"
             for s in exceptional:
                 # Stop listening for input on the connection
-                self.inputs.remove(s)
+                if s in self.inputs:
+                    self.inputs.remove(s)
                 if s in self.outputs:
                     self.outputs.remove(s)
                 s.close()

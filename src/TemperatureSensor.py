@@ -18,13 +18,14 @@ class TemperatureSensor:
         data = None
         try:
             data = {
-                "TYPE": "BME680",
-                "timestamp": datetime.utcnow().isoformat(),
-                "temperature": self.bme680.temperature,
-                "gas": self.bme680.gas,
-                "humidity": self.bme680.humidity,
-                "pressure": self.bme680.pressure,
-                "altitude": self.bme680.altitude,
+                "bme680": {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "temperature": self.bme680.temperature,
+                    "gas": self.bme680.gas,
+                    "humidity": self.bme680.humidity,
+                    "pressure": self.bme680.pressure,
+                    "altitude": self.bme680.altitude,
+                }
             }
         finally:
             return data

@@ -16,6 +16,6 @@ class LCDService:
                            auto_linebreaks=True)
 
     def write_line(self, text):
-        print("should print " + text)
-        self.lcd.cursor_pos = (0, 0)
+        self.lcd.clear()
+        self.lcd.home()
         self.lcd.write_string(text)

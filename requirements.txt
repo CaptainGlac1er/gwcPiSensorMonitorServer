@@ -5,3 +5,4 @@ smbus2
 RPLCD
 Adafruit_GPIO
 Adafruit_WS2801
+adafruit-circuitpython-ws2801

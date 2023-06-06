@@ -20,7 +20,7 @@ from Server import Server
 
 gather_event = threading.Event()
 
-def check_light(light_sensor_connection: LightSensor, led_service, output):
+def check_light(light_sensor_connection: LightSensor, lcd_service: LCDService, led_service: LEDService, output):
     print("starting light")
     while not gather_event.is_set():
 
@@ -30,7 +30,7 @@ def check_light(light_sensor_connection: LightSensor, led_service, output):
         # print("sensor: %5d" % (light_level))
         normized = (50000 - light_level) / 50000
         led_service.set_color(round(255 * normized), round(255 * (1 - normized)), 0)
-        #lcd_service.write_line('{:d}'.format(light_level))
+        lcd_service.write_line('{:d}'.format(light_level))
         output({
             "light": light_level
         })
@@ -89,8 +89,8 @@ def main(argv):
     bus = smbus2.SMBus(1)  # or bus = smbus.SMBus(1) for Revision 2 boards
     time.sleep(1)
     address = 0x68  # This is the address value read via the i2cdetect command
-    #lcd_service = LCDService()
-    #lcd_service.write_line("Hello")
+    lcd_service = LCDService()
+    lcd_service.write_line("Hello")
     led_service = LEDService()
     bme_sensor = TemperatureSensor()
     motion_sensor = MotionSensor(I2CService(bus, address), 0)
@@ -126,13 +126,14 @@ def main(argv):
                f'{data["accelerometer"]["x"]},{data["accelerometer"]["y"]},{data["accelerometer"]["z"]}'
 
     def format_bme(data):
-        return f'{datetime.utcnow()},' \
-               f'{data["temperature"]},{data["gas"]},{data["humidity"]},' \
-               f'{data["pressure"]},{data["altitude"]}'
+        return f'{data["bme680"]["timestamp"]},' \
+               f'{data["bme680"]["temperature"]},{data["bme680"]["gas"]},{data["bme680"]["humidity"]},' \
+               f'{data["bme680"]["pressure"]},{data["bme680"]["altitude"]}'
 
     light_thread = threading.Thread(
         target=check_light,
         args=(light_sensor,
+              lcd_service,
               led_service,
               save_data(
                   f'{folder}/light-thread-{date.today()}.csv',
