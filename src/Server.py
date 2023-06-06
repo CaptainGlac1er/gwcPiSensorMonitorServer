@@ -43,10 +43,7 @@ class Server(threading.Thread):
                     # Give the connection a queue for data we want to send
                     self.message_queues[connection] = queue.Queue()
                 else:
-                    if s in self.outputs:
-                        self.outputs.remove(s)
-                    self.inputs.remove(s)
-                    s.close()
+                    self.remove_connection(s)
 
                 # Handle outputs
             for s in writable:
@@ -55,21 +52,26 @@ class Server(threading.Thread):
                 except queue.Empty:
                     continue
                     # outputs.remove(s)
-                else:
+                try:
                     s.send(next_msg)
                     s.send(b'\n')
+                except OSError:
+                    self.remove_connection(s)
 
                 # Handle "exceptional conditions"
             for s in exceptional:
                 # Stop listening for input on the connection
-                if s in self.inputs:
-                    self.inputs.remove(s)
-                if s in self.outputs:
-                    self.outputs.remove(s)
-                s.close()
+                self.remove_connection(s)
 
                 # Remove message queue
                 del self.message_queues[s]
+
+    def remove_connection(self, s: socket.socket):
+        if s in self.inputs:
+            self.inputs.remove(s)
+        if s in self.outputs:
+            self.outputs.remove(s)
+        s.close()
 
     def send_data(self, data_string: str):
         for s in self.message_queues:
